@@ -1,7 +1,7 @@
 package class01;
 
 //数组倒转
-public class Exercise01 {
+public class Reverse {
     public static void main(String[] args) {
         int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
         for (int min = 0, max = arr.length - 1; min < max; min++, max--) {
