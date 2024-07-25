@@ -7,7 +7,8 @@ public class test {
         Scanner sc = new Scanner(System.in);
         CircleDemo circle = new CircleDemo();
         SquareDemo square = new SquareDemo();
-        System.out.println("请输入要打印的图形：1.圆形 2.正方形");
+        TriangleDemo triangle = new TriangleDemo();
+        System.out.println("请输入要打印的图形：1.圆形 2.正方形 3.三角形");
         int choice = sc.nextInt();
         switch (choice) {
             case 1:
@@ -15,6 +16,9 @@ public class test {
                 break;
             case 2:
                 square.draw();
+                break;
+            case 3:
+                triangle.draw();
                 break;
         }
     }
