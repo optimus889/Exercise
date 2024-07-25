@@ -5,8 +5,8 @@ import java.util.Scanner;
 public class test {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Circle circle = new Circle();
-        Square square = new Square();
+        CircleDemo circle = new CircleDemo();
+        SquareDemo square = new SquareDemo();
         System.out.println("请输入要打印的图形：1.圆形 2.正方形");
         int choice = sc.nextInt();
         switch (choice) {

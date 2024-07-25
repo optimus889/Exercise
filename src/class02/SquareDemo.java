@@ -2,7 +2,7 @@ package class02;
 
 import java.util.Scanner;
 
-public class Square extends ShapePainting {
+public class SquareDemo extends ShapePainting {
     Scanner sc = new Scanner(System.in);
 
     @Override

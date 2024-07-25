@@ -2,7 +2,7 @@ package class02;
 
 import java.util.Scanner;
 
-public class Circle extends ShapePainting{
+public class CircleDemo extends ShapePainting{
     Scanner sc = new Scanner(System.in);
 
     @Override
