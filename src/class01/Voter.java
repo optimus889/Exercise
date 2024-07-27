@@ -7,7 +7,7 @@ import java.util.Set;
 public class Voter {
     private static final int MAX_COUNT = 100;
     private static int count;
-    private static final Set<Voter>voters = new HashSet<Voter>();
+    private static final Set<Voter>voters = new HashSet<>();
     private final String name;
     private String answer;
 
