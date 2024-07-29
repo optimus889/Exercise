@@ -17,10 +17,11 @@ public class PriorityQueueDemo {
             maxHeap.add(stone);
         }
             while (maxHeap.size() > 1) {
-                int stone1 = maxHeap.poll();
-                int stone2 = maxHeap.poll();
-                if (stone1 != stone2) {
-                    maxHeap.add(stone1 - stone2);
+                int y = maxHeap.poll();
+                int x = maxHeap.poll();
+
+                if (x != y) {
+                    maxHeap.add(y - x);
                 }
             }
                 return maxHeap.isEmpty() ? 0 : maxHeap.poll();

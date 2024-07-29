@@ -19,20 +19,14 @@ import java.util.Set;
  * 第二级：实现 addFrom、addTo、remove 和 nSources 方法。
  */
 public class HashDemo{
-
-    private static class Pipe{
-        int id;
-        Set<Integer> incoming = new HashSet<>();
-        Set<Integer> outgoing = new HashSet<>();
-
-        Pipe(int id){
-            this.id = id;
-        }
-    }
-
+    private HashMap<Integer, Pipe> pipes = new HashMap<>();
     private int nextId = 0;
-    private Map<Integer, Pipe> pipes = new HashMap<>();
-    private Set<Integer> removePipes = new HashSet<>();
+    private int sourceCount = 0;
+
+    private class Pipe {
+        HashSet<Integer> incoming = new HashSet<>();
+        HashSet<Integer> outgoing = new HashSet<>();
+    }
 
     public HashDemo() {
     }
@@ -41,8 +35,9 @@ public class HashDemo{
      * 该方法应返回新管道的ID。
      */
     public int add() {
-        Pipe newPipe = new Pipe(nextId);
+        Pipe newPipe = new Pipe();
         pipes.put(nextId, newPipe);
+        sourceCount++;  // 新添加的管道没有入站连接，因此是源头
         return nextId++;
     }
     /**
@@ -53,16 +48,13 @@ public class HashDemo{
      * 如果添加新管道会违反这些规则，则方法不应添加管道，并返回 -1。否则，方法应更新网络并返回新管道的ID。
      */
     public int addFrom(int fromPipeId) {
-        if(pipes.containsKey(fromPipeId)&&removePipes.contains(fromPipeId)) {
-            return -1;
+        if (!pipes.containsKey(fromPipeId) || pipes.get(fromPipeId).outgoing.size() >= 3) {
+            return -1;  // 如果来源管道不存在或已有3个出站连接，则不能添加
         }
         Pipe fromPipe = pipes.get(fromPipeId);
-        if(fromPipe.outgoing.size() >= 2) {
-            return -1;
-        }
-        Pipe newPipe = new Pipe(nextId);
+        Pipe newPipe = new Pipe();
         newPipe.incoming.add(fromPipeId);
-        newPipe.outgoing.add(nextId);
+        fromPipe.outgoing.add(nextId);
         pipes.put(nextId, newPipe);
         return nextId++;
     }
@@ -74,17 +66,22 @@ public class HashDemo{
      * 如果添加新管道会违反这些规则，则方法不应添加管道，并返回 -1。否则，方法应更新网络并返回新管道的ID。
      */
     public int addTo(int toPipeId) {
-        if(!pipes.containsKey(toPipeId)&&removePipes.add(toPipeId)) {
-        return -1;
+        if (!pipes.containsKey(toPipeId) || pipes.get(toPipeId).incoming.size() >= 3) {
+            return -1;  // 如果目标管道不存在或已有3个入站连接，则不能添加
         }
         Pipe toPipe = pipes.get(toPipeId);
-        if(toPipe.incoming.size() >= 2) {
-            return -1;
-        }
-        Pipe newPipe = new Pipe(nextId);
+        boolean wasSource = toPipe.incoming.isEmpty();  // 检查目标管道是否是源头
+
+        Pipe newPipe = new Pipe();
         newPipe.outgoing.add(toPipeId);
-        newPipe.incoming.add(nextId);
+        toPipe.incoming.add(nextId);
         pipes.put(nextId, newPipe);
+
+        if (wasSource) {
+            sourceCount--;  // 如果目标管道原来是源头，现在失去了源头状态，减少源头计数
+        }
+
+        sourceCount++;  // 新管道没有入站连接，因此是源头，增加源头计数
         return nextId++;
     }
     /**
@@ -93,17 +90,24 @@ public class HashDemo{
      * 如果管道ID在网络中不存在（未被添加或已被移除），则方法不应执行任何操作。
      */
     public void remove(int pipeId) {
-        if(!pipes.containsKey(pipeId)||removePipes.add(pipeId)) {
-            return;
+        if (!pipes.containsKey(pipeId)) {
+            return;  // 如果管道不存在，则不执行任何操作
         }
         Pipe pipe = pipes.get(pipeId);
-        for(int incomingId : pipe.incoming) {
-            pipes.get(incomingId).outgoing.remove(pipeId);
+        if (pipe.incoming.isEmpty()) {
+            sourceCount--;  // 如果被移除的管道是源头，源头计数减少
         }
-        for(int outgoingId : pipe.outgoing) {
-            pipes.get(outgoingId).incoming.remove(pipeId);
+        for (int fromId : pipe.incoming) {
+            Pipe fromPipe = pipes.get(fromId);
+            fromPipe.outgoing.remove(pipeId);
         }
-        removePipes.add(pipeId);
+        for (int toId : pipe.outgoing) {
+            Pipe toPipe = pipes.get(toId);
+            toPipe.incoming.remove(pipeId);
+            if (toPipe.incoming.isEmpty()) {
+                sourceCount++;  // 如果移除连接后其他管道成为源头，增加源头计数
+            }
+        }
         pipes.remove(pipeId);
     }
     /**
@@ -112,13 +116,7 @@ public class HashDemo{
      * 源是指没有进入连接的管道。
      */
     public int nSources() {
-        int count = 0;
-        for(Pipe pipe : pipes.values()) {
-            if(pipe.incoming.isEmpty()) {
-                count++;
-            }
-        }
-        return count;
+        return sourceCount;
     }
 
     public static void main(String[] args) {
