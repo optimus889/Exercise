@@ -2,7 +2,7 @@ package class03;
 
 import java.util.Arrays;
 
-class MyStack<E> {
+class MyStack<T> {
     private Object[] elements;
     private int size = 0;
 
@@ -17,11 +17,11 @@ class MyStack<E> {
         elements = new Object[capacity];
     }
 
-    public void push(E e) {
+    public void push(T t) {
        if(size >= elements.length){
            expandCapacity();
        }
-       elements[size++] = e;
+       elements[size++] = t;
     }
 
     private void expandCapacity() {
